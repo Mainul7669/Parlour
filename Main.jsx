@@ -1,21 +1,16 @@
-import { Outlet, useLocation } from "react-router-dom";
-import Footer from "../components/pages/Footer";
-import Navbar from "../components/Shared/Navbar";
+import React from 'react'
+import ReactDOM from 'react-dom/client'
+import './index.css'
+import {
+  RouterProvider,
+} from "react-router-dom";
+import { router } from './Routes/routes';
+import AuthProvider from './providers/AuthProvider';
 
-function Main() {
-  const location = useLocation();
-
-  const noNavbarFooter =
-    location.pathname.includes("login") || location.pathname.includes("signup") || location.pathname.includes("dashboard");
-
-  return (
-    <div>
-      {noNavbarFooter || <Navbar></Navbar>}
-      <Outlet></Outlet>
-      {noNavbarFooter || <Footer></Footer>}
-      {/* Main content goes here */}
-    </div>
-  );
-}
-
-export default Main;
+ReactDOM.createRoot(document.getElementById('root')).render(
+  <React.StrictMode>
+    <AuthProvider>
+     <RouterProvider router={router} />
+     </AuthProvider>
+  </React.StrictMode>,
+)

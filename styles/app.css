@@ -1,0 +1,20 @@
+/* Add this to your CSS stylesheet */
+.close-icon-open {
+    position: absolute;
+    z-index: 1;
+    top: 10px; /* Adjust the top value as needed */
+    right: 10px; 
+    color: #F63E7B;/* Adjust the right value as needed */
+  }
+  
+/* Add this CSS to your stylesheet */
+
+li:hover svg path {
+  fill: #F63E7B; /* Fill color on SVG path hover */
+}
+
+.active-link .active-stroke {
+  stroke: red;
+}
+
+
