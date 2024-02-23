@@ -1,9 +1,13 @@
-import { useState } from 'react';
+import { useState } from "react";
+import Swal from "sweetalert2";
 
 const AddService = () => {
-  const [serviceTitle, setServiceTitle] = useState('');
-  const [price, setPrice] = useState('');
-  const [description, setDescription] = useState('');
+  const img_hosting_token = import.meta.env.VITE_IMAGE_UPLOAD_TOKEN;
+  const img_hosting_url = `https://api.imgbb.com/1/upload?key=${img_hosting_token}`;
+
+  const [serviceTitle, setServiceTitle] = useState("");
+  const [price, setPrice] = useState("");
+  const [description, setDescription] = useState("");
   const [selectedImage, setSelectedImage] = useState(null);
 
   const handleImageUpload = (e) => {
@@ -13,14 +17,75 @@ const AddService = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // You can handle the form submission logic here
-    // Use serviceTitle, price, description, and selectedImage as form data
-    console.log({
-      serviceTitle,
-      price,
-      description,
-      selectedImage,
-    });
+
+    const formData = new FormData();
+    formData.append("image", selectedImage);
+
+    fetch(img_hosting_url, {
+      method: "POST",
+      body: formData,
+    })
+      .then((res) => res.json())
+      .then((imgResponse) => {
+        if (imgResponse.success) {
+          const imgUrl = imgResponse.data.display_url;
+
+          const serviceData = {
+            serviceTitle,
+            price,
+            description,
+            image: imgUrl,
+          };
+
+          fetch("https://parlour-server-seven.vercel.app/services", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(serviceData),
+          })
+            .then((response) => {
+              if (response.ok) {
+                // Reset form fields after successful submission
+                setServiceTitle("");
+                setPrice("");
+                setDescription("");
+                setSelectedImage(null);
+
+                Swal.fire({
+                  text: "Service Added Successfully",
+                  icon: "success",
+                  showConfirmButton: false,
+                  timer: 1500,
+                });
+              } else {
+                // Handle errors
+                throw new Error("Network response was not ok.");
+              }
+            })
+            .catch((error) => {
+              console.error(
+                "There was a problem with the fetch operation:",
+                error
+              );
+              // Optionally, show an error message to the user
+              Swal.fire(
+                "Error",
+                "There was an error adding the service. Please try again later.",
+                "error"
+              );
+            });
+        }
+      })
+      .catch((error) => {
+        console.error("There was a problem with the fetch operation:", error);
+        // Optionally, show an error message to the user
+        Swal.fire(
+          "Error",
+          "There was an error uploading the photo. Please try again later.",
+          "error"
+        );
+      });
   };
 
   return (
@@ -28,7 +93,10 @@ const AddService = () => {
       <h2 className="text-2xl font-semibold mb-4">Add Service</h2>
       <form onSubmit={handleSubmit}>
         <div className="mb-4 flex flex-col md:flex-row md:items-center">
-          <label htmlFor="serviceTitle" className="text-gray-600 font-medium mb-2">
+          <label
+            htmlFor="serviceTitle"
+            className="text-gray-600 font-medium mb-2"
+          >
             Service Title
           </label>
           <input
@@ -55,7 +123,10 @@ const AddService = () => {
           />
         </div>
         <div className="mb-4">
-          <label htmlFor="price" className="block text-gray-600 font-medium mb-2">
+          <label
+            htmlFor="price"
+            className="block text-gray-600 font-medium mb-2"
+          >
             Price
           </label>
           <input
@@ -69,7 +140,10 @@ const AddService = () => {
           />
         </div>
         <div className="mb-4">
-          <label htmlFor="description" className="block text-gray-600 font-medium mb-2">
+          <label
+            htmlFor="description"
+            className="block text-gray-600 font-medium mb-2"
+          >
             Description
           </label>
           <textarea

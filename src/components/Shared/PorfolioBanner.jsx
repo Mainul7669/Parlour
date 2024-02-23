@@ -6,7 +6,7 @@ function PortfolioBanner() {
       {/* Left side (Image) */}
       <div className="mb-4 lg:w-1/2 lg:mb-0">
         <img
-          src="src\assets\images\engin-akyurt-g-m8EDc4X6Q-unsplash 1.png"
+          src="https://i.ibb.co/Gpd9G8X/engin-akyurt-g-m8-EDc4-X6-Q-unsplash-1.png"
           alt="Banner Image"
           className="w-[580px] h-[381px] object-cover object-center rounded-lg"
         />

@@ -1,4 +1,4 @@
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { AuthContext } from "../../providers/AuthProvider";
@@ -11,18 +11,17 @@ const Navbar = () => {
 
   const handleLogOut = () => {
     logOut()
-    .then( () => {
-      Swal.fire({
-        position: 'center',
-        icon: 'success',
-        title: 'You are logged out',
-        showConfirmButton: false,
-        timer: 1500
+      .then(() => {
+        Swal.fire({
+          position: "center",
+          icon: "success",
+          title: "You are logged out",
+          showConfirmButton: false,
+          timer: 1500,
+        });
       })
-     })
-    .catch(error => console.log(error));
-  }
-
+      .catch((error) => console.log(error));
+  };
 
   const scrollToSection = (sectionId) => {
     const element = document.getElementById(sectionId);
@@ -32,12 +31,46 @@ const Navbar = () => {
     setNavToggle(false); // Close the mobile menu after clicking a link
   };
 
+  const [email, setEmail] = useState("");
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  // console.log(isAdmin);
+
+  useEffect(() => {
+    if (user) {
+      setEmail(user.email);
+      fetchUserData().then((userData) => {
+        if (userData) {
+          const isAdminUser = userData.find(
+            (userData) =>
+              userData.email === user.email && userData.role === "admin"
+          );
+          setIsAdmin(!!isAdminUser);
+        }
+      });
+    }
+  }, [user]);
+
+  const fetchUserData = async () => {
+    try {
+      const response = await fetch("https://parlour-server-seven.vercel.app/users");
+      if (!response.ok) {
+        throw new Error("Failed to fetch user data");
+      }
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+      return null;
+    }
+  };
+
   return (
     <div className="bg-[#fff8f5] text-[#474747] flex flex-wrap justify-center gap-4 p-4 lg:px-14 lg:pl-20">
       <nav className="navbar sticky top-0 z-10 bg-[#fff8f5]">
         <div className="flex-1">
           <a href="/">
-            <img src="src/assets/logo.png" alt="Logo" className="h-12" />
+            <img src="https://i.ibb.co/xg12PKn/logo.png" alt="Logo" className="h-12" />
           </a>
         </div>
         <div
@@ -45,7 +78,7 @@ const Navbar = () => {
             navToggle ? "left-0" : "left-[-120%]"
           } top-[4.5rem] flex w-full flex-col bg-[#fff8f5] pb-3 pt-2 transition-all duration-300 lg:static lg:w-[unset] lg:flex-row lg:bg-transparent lg:pb-0 lg:pt-0 dark:lg:bg-transparent`}
         >
-          <ul className="  gap-4 menu menu-horizontal flex-col px-1 lg:flex-row">
+          <ul className="  gap-4 menu menu-horizontal flex-col px-1 lg:flex-row font-semibold">
             <li className="mx-auto">
               <Link to="/" onClick={() => scrollToSection("home")}>
                 Home
@@ -56,11 +89,30 @@ const Navbar = () => {
                 Our Portfolio
               </a>
             </li>
-            <li className="mx-auto">
-              <Link to="dashboard" onClick={() => scrollToSection("team")}>
-                Dashboard
-              </Link>
-            </li>
+
+            {isAdmin ? (
+              <>
+                {" "}
+                <li className="mx-auto">
+                  <Link to="dashboard/orderlist" onClick={() => scrollToSection("team")}>
+                    Dashboard
+                  </Link>
+                </li>{" "}
+              </>
+            ) : (
+              <>
+                {" "}
+                <li className="mx-auto">
+                  <Link
+                    to="dashboard/book"
+                    onClick={() => scrollToSection("team")}
+                  >
+                    Appointments
+                  </Link>
+                </li>{" "}
+              </>
+            )}
+
             <li className="mx-auto">
               <a href="#contact" onClick={() => scrollToSection("contact")}>
                 Contact Us
@@ -68,21 +120,26 @@ const Navbar = () => {
             </li>
           </ul>
 
-          {  user ? <>
-          {/* <span>{user?.displayName}</span> */}
-            <button onClick={handleLogOut} className="bg-[#F63E7B] text-[#FFFFFF] hover:bg-pink-400 py-2 px-6 rounded text-sm font-semibold transition duration-300 ease-in-out transform hover:scale-105">
-               Logout
+          {user ? (
+            <>
+              {/* <span>{user?.displayName}</span> */}
+              <button
+                onClick={handleLogOut}
+                className="bg-[#F63E7B] text-[#FFFFFF] hover:bg-pink-400 py-2 px-6 rounded text-sm font-semibold transition duration-300 ease-in-out transform hover:scale-105"
+              >
+                Logout
               </button>
-          </> : <>
-            <Link to="login">
-              <button className="bg-[#F63E7B] text-[#FFFFFF] hover:bg-pink-400 py-2 px-6 rounded text-sm font-semibold transition duration-300 ease-in-out transform hover:scale-105">
-                {" "}
-                Login{" "}
-              </button>
-            </Link>
             </>
-          }
-
+          ) : (
+            <>
+              <Link to="login">
+                <button className="bg-[#F63E7B] text-[#FFFFFF] hover:bg-pink-400 py-2 px-6 rounded text-sm font-semibold transition duration-300 ease-in-out transform hover:scale-105">
+                  {" "}
+                  Login{" "}
+                </button>
+              </Link>
+            </>
+          )}
         </div>
 
         <label className="swap-rotate swap btn-ghost btn-circle btn ml-2 bg-[#fff8f5] lg:hidden">

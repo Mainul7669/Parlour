@@ -1,4 +1,4 @@
-import React from "react";
+
 import { useContext } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
@@ -6,12 +6,14 @@ import { AuthContext } from "../../providers/AuthProvider";
 import Swal from "sweetalert2";
 
 function SignUp() {
-  const { handleSubmit, reset, control, watch, setError, clearErrors, formState } = useForm();
+  const { handleSubmit, reset, control, setError, formState } = useForm();
   const { isSubmitting, errors } = formState;
 
   const { createUser, updateUserProfile } = useContext(AuthContext);
 
   const navigate = useNavigate();
+
+
 
   const onSubmit = (data) => {
     if (data.password !== data.confirmPassword) {
@@ -22,31 +24,61 @@ function SignUp() {
     } else {
       const displayName = `${data.firstName} ${data.lastName}`;
       createUser(data.email, data.password)
-      .then(result => {
-        const loggedUser = result.user;
-        console.log(loggedUser);
-        updateUserProfile(displayName)
-        .then( () => {
-          console.log("user profile info updated");
-          reset();
-          Swal.fire({
-            position: 'center',
-            icon: 'success',
-            title: 'User created successfully',
-            showConfirmButton: false,
-            timer: 1500
-          });
-
-          navigate('/');
-
+        .then((result) => {
+          const loggedUser = result.user;
+          console.log(loggedUser);
+          updateUserProfile(displayName)
+            .then(() => {
+              console.log("user profile info updated");
+              reset();
+              Swal.fire({
+                position: "center",
+                icon: "success",
+                title: "User created successfully",
+                showConfirmButton: false,
+                timer: 1500,
+              });
+  
+              navigate("/");
+            })
+            .catch((error) => console.log(error));
         })
-        .catch(error => console.log(error))
-       })
-
+        .catch((error) => {
+          // Handle error creating user
+          console.error("Error creating user:", error);
+          Swal.fire({
+            position: "center",
+            icon: "error",
+            title: "Error creating user",
+            text: error.message,
+          });
+        });
+  
+      // Post user data to the server
+      fetch("https://parlour-server-seven.vercel.app/users", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      })
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error("Failed to post user data to server");
+          }
+          console.log("User data posted successfully");
+          // You can handle success here if needed
+        })
+        .catch((error) => {
+          // Handle error posting user data to server
+          console.error("Error posting user data to server:", error);
+          // You can show an error message to the user if needed
+        });
     }
   };
+  
 
-  const password = watch("password", "");
+  // const password = watch("password", "");
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
@@ -167,7 +199,7 @@ function SignUp() {
         <div className="mt-4 flex justify-center">
           <button className='flex justify-center gap-10 className="bg-[#F63E7B] border border-[#C7C7C7] hover:bg-pink-300 py-2 px-6 text-sm font-semibold hover:border-0 text-black rounded-full'>
             <img
-              src="src\assets\icons\Group 573.png"
+              src="https://i.ibb.co/sHD8gRB/Group-573.png"
               alt=""
               width="24px"
               height="24px"

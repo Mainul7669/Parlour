@@ -1,54 +1,67 @@
+import { useState, useEffect, useContext } from "react";
+import { AuthContext } from "../../providers/AuthProvider";
 
-const cardData = [
-  {
-    id: 1,
-    title: 'Anti Age Face Treatment',
-    
-    description:
-      'We craft stunning and amazing web UI, using a well-drafted UX to fit your product.',
-    imagePath: '/src/assets/icons/Group 1373.png',
-  },
-  {
-    id: 2,
-    title: 'Hair Color & Styling',
-    
-    description:
-      'Amazing flyers, social media posts and brand representations that would make your brand stand out.',
-    imagePath: '/src/assets/icons/Group 1372.png',
-  },
-  
-];
+const BookingList = () => {
+  const { user } = useContext(AuthContext);
+  const [appointments, setAppointments] = useState([]);
 
-const BookingList = ({ showAllCards }) => {
-  const visibleCards = showAllCards ? cardData : cardData.slice(0, 3);
+  useEffect(() => {
+    const fetchAppointments = async () => {
+      try {
+        const response = await fetch(
+          `https://parlour-server-seven.vercel.app/appointments/?email=${user.email}`
+        );
+        if (!response.ok) {
+          throw new Error("Failed to fetch appointments");
+        }
+        const data = await response.json();
+        setAppointments(data);
+      } catch (error) {
+        console.error("Error fetching appointments:", error);
+      }
+    };
+
+    if (user.email) {
+      fetchAppointments();
+    }
+  }, [user.email]);
 
   return (
     <div className="bg-[#F4F7FC] flex flex-wrap justify-start gap-8 p-10">
-      {visibleCards.map((card) => (
-        <div
-          key={card.id}
-          className="card w-[320px] bg-[#FFFFFF] shadow-sm"
-        >
-         <div className="flex items-center justify-around">
-         <figure className="px-4 pt-4">
-            <img src={card.imagePath} alt="" className="w-[72px] h-[72px]" />
-          </figure>
-          <button
-        className="px-2 py-2 rounded bg-[#FFE3E3] text-[#FF4545]">
-          Pending
-      </button>
-         </div>
+      {appointments.map((card) => (
+        <div key={card._id} className="card w-[320px] bg-[#FFFFFF] shadow-sm">
+          <div className="flex justify-end">
+            <button
+              style={{
+                color:
+                  card.statusbar === "Pending"
+                    ? "#FF4545"
+                    : card.statusbar === "In Progress"
+                    ? "#FFD700"
+                    : "#008000",
+                backgroundColor:
+                  card.statusbar === "Pending"
+                    ? "#FFE3E3"
+                    : card.statusbar === "In Progress"
+                    ? "#FFF4CC"
+                    : "#E6F4EA",
+              }}
+              className="px-2 py-2 rounded"
+            >
+              {card.statusbar}
+            </button>
+          </div>
           <div className="card-body">
-            <h2 className="card-title text-[#111430]">{card.title}</h2>
-           
-            <p className="text-[#000000B2] text-sm">{card.description}</p>
+            <h2 className="card-title text-[#111430]">{card.services}</h2>
+            <p className="text-gray-700 font-semibold text-sm">
+              Payment Method: {card.paymentMethod}
+            </p>
+            <h4>ID: {card._id}</h4>
           </div>
         </div>
       ))}
     </div>
   );
 };
-
-
 
 export default BookingList;

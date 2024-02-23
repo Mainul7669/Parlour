@@ -35,12 +35,14 @@ const TestimonialSwiper = () => {
             <div className="flex items-center mb-4">
               {/* Image */}
               <img
-                src="src/assets/images/Ellipse 90.png"
+                src="https://i.ibb.co/pf872kt/Ellipse-90.png"
                 alt="Card Image"
                 width="40px"
                 height="40px"
                 className="mr-4"
               />
+
+
 
               {/* Title and Subtitle */}
               <div>
@@ -74,7 +76,7 @@ const TestimonialSwiper = () => {
             <div className="flex items-center mb-4">
               {/* Image */}
               <img
-                src="src/assets/images/Ellipse 91.png"
+                src="https://i.ibb.co/yqQ3G5H/Ellipse-91.png"
                 alt="Card Image"
                 width="40px"
                 height="40px"
@@ -113,7 +115,7 @@ const TestimonialSwiper = () => {
             <div className="flex items-center mb-4">
               {/* Image */}
               <img
-                src="src/assets/images/Ellipse 92.png"
+                src="https://i.ibb.co/q9Xzd1d/Ellipse-92.png"
                 alt="Card Image"
                 width="40px"
                 height="40px"
@@ -153,7 +155,7 @@ const TestimonialSwiper = () => {
             <div className="flex items-center mb-4">
               {/* Image */}
               <img
-                src="src/assets/images/Ellipse 90.png"
+                src="https://i.ibb.co/pf872kt/Ellipse-90.png"
                 alt="Card Image"
                 width="40px"
                 height="40px"
@@ -192,7 +194,7 @@ const TestimonialSwiper = () => {
             <div className="flex items-center mb-4">
               {/* Image */}
               <img
-                src="src/assets/images/Ellipse 91.png"
+                src="https://i.ibb.co/yqQ3G5H/Ellipse-91.png"
                 alt="Card Image"
                 width="40px"
                 height="40px"
@@ -231,7 +233,7 @@ const TestimonialSwiper = () => {
             <div className="flex items-center mb-4">
               {/* Image */}
               <img
-                src="src/assets/images/Ellipse 92.png"
+                src="https://i.ibb.co/q9Xzd1d/Ellipse-92.png"
                 alt="Card Image"
                 width="40px"
                 height="40px"

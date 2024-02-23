@@ -1,15 +1,20 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
+import { AuthContext } from "../../providers/AuthProvider";
 
 const Book = () => {
+  const { user } = useContext(AuthContext);
+
   const [formData, setFormData] = useState({
     fullName: "",
-    email: "",
+    email: user.email,
     services: "",
-    paymentMethod: "", // To store the selected payment method
+    paymentMethod: "",
     cardNumber: "",
     expiration: "",
     cvc: "",
   });
+
+  const [paymentSuccess, setPaymentSuccess] = useState(false);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -19,11 +24,43 @@ const Book = () => {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // You can handle form submission logic here
-    console.log(formData);
+    try {
+      // Add statusbar: "Pending" to formData
+      const formDataWithStatus = { ...formData, statusbar: "Pending" };
+
+      // Make an HTTP POST request to send formData to the server
+      const response = await fetch("https://parlour-server-seven.vercel.app/appointments", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formDataWithStatus), // Send formData with statusbar
+      });
+
+      if (response.ok) {
+        // Simulate payment success for demonstration purposes
+        setPaymentSuccess(true);
+        // Reset formData after successful submission
+        setFormData({
+          fullName: "",
+          email: user.email,
+          services: "",
+          paymentMethod: "",
+          cardNumber: "",
+          expiration: "",
+          cvc: "",
+        });
+        console.log("Appointment booked successfully!");
+      } else {
+        console.error("Failed to book appointment");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+    }
   };
+
 
   return (
     <div>
@@ -35,7 +72,7 @@ const Book = () => {
               type="text"
               id="full-name"
               name="fullName"
-              placeholder="Anika Ahmed"
+              placeholder="Full Name"
               className="w-full lg:w-1/3 px-4 py-3 bg-[#FFFFFF] text-black rounded-md focus:ring focus:ring-[#16322E]"
               value={formData.fullName}
               onChange={handleInputChange}
@@ -46,10 +83,11 @@ const Book = () => {
               type="email"
               id="email"
               name="email"
-              placeholder="Anika@gmail.com"
+              placeholder={user.email}
               className="w-full lg:w-1/3 px-4 py-3 bg-[#FFFFFF] text-black rounded-md focus:ring focus:ring-[#16322E]"
-              value={formData.email}
+              value={user.email}
               onChange={handleInputChange}
+              disabled
             />
           </div>
           <div className="mb-4">
@@ -66,11 +104,10 @@ const Book = () => {
               <option value="Anti Age Face Treatment">
                 Anti Age Face Treatment
               </option>
-              <option value="service2">Service 2</option>
-              <option value="service3">Service 3</option>
+              <option value="Hair Color & Styling">Hair Color & Styling</option>
+              <option value="Skin Care Treatment">Skin Care Treatment</option>
             </select>
           </div>
-
           <div className="mb-4">
             <p className="mb-2">Select Payment Method:</p>
             <label className="inline-flex items-center">
@@ -81,7 +118,6 @@ const Book = () => {
                 className="form-radio h-5 w-5 "
                 onChange={handleInputChange}
               />
-
               <span
                 className={`ml-2 hover:text-[#F63E7B] ${
                   formData.paymentMethod === "Credit Card"
@@ -175,18 +211,26 @@ const Book = () => {
             </div>
           )}
 
-          <div className="flex gap-6 items-center pt-4">
-            <p className="text-[#16322E] font-semibold">
-              Your Service charged will be{" "}
-              <span className="font-bold">$1000</span>
-            </p>
-            <button
-              type="submit"
-              className="bg-[#F63E7B] text-white px-10 py-3 rounded-lg hover:bg-red-300"
-            >
-              Pay
-            </button>
-          </div>
+          {/* Payment success message */}
+          {paymentSuccess && (
+            <div className="text-green-500 mt-4">Payment successful!</div>
+          )}
+
+          {/* Render the "Pay" button only if payment is not successful */}
+          {!paymentSuccess && (
+            <div className="flex gap-6 items-center pt-4">
+              <p className="text-[#16322E] font-semibold">
+                Your Service charged will be{" "}
+                <span className="font-bold">$1000</span>
+              </p>
+              <button
+                type="submit"
+                className="bg-[#F63E7B] text-white px-10 py-3 rounded-lg hover:bg-red-300"
+              >
+                Pay
+              </button>
+            </div>
+          )}
         </form>
       </div>
     </div>
